@@ -1,3 +1,4 @@
+var Base = require('stdopt/base')
 var Emitter = require('events')
 
 module.exports = function (Model) {
@@ -22,12 +23,32 @@ module.exports = function (Model) {
     }
     return new Proxy(target[prop], {
       apply (fn, self, args) {
-        var data = fn.apply(self, args)
-        bus.emit(prop, data, target, args)
-        return data
+        var res = Result.of(fn, self, args)
+        bus.emit(prop, res, target, args)
+        return res
       }
     })
   }
 
   return StdModel
+}
+
+/**
+ * Result opt
+ */
+function Result (res) {
+  Base.call(this, res)
+}
+
+Result.of = function (fn, self, args) {
+  try {
+    var res = fn.apply(self, args)
+    return new Result(res)
+  } catch (err) {
+    return new Result(err)
+  }
+}
+
+Result.parse = function (res) {
+  return typeof res === 'undefined' ? null : res
 }

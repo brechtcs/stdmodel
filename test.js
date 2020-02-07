@@ -13,12 +13,18 @@ Model.prototype.input = function (data) {
   return this.prefix + ': ' + data
 }
 
+Model.prototype.empty = function () {}
+
+Model.prototype.fail = function () {
+  throw new Error('failure')
+}
+
 test('static', function (t) {
   var pending = true
 
   function listener (result, target, args) {
     t.ok(pending)
-    t.equal(result, 'static: ping')
+    t.equal(result.value(), 'static: ping')
     t.equal(target.prototype, Model.prototype)
     t.equal(args.length, 2)
     t.equal(args[0], 'static')
@@ -41,12 +47,12 @@ test('instances', function (t) {
     t.ok(target instanceof Model)
 
     if (target.prefix === 'first') {
-      t.equal(result, 'first: dit')
+      t.equal(result.value(), 'first: dit')
       t.equal(args.length, 2)
       t.equal(args[0], 'dit')
       t.equal(args[1], 'nope')
     } else if (target.prefix === 'second') {
-      t.equal(result, 'second: dat')
+      t.equal(result.value(), 'second: dat')
       t.equal(args.length, 1)
       t.equal(args[0], 'dat')
     } else {
@@ -56,5 +62,24 @@ test('instances', function (t) {
 
   first.input('dit', 'nope')
   second.input('dat')
+  t.end()
+})
+
+test('result', function (t) {
+  var obj = new Model('result')
+
+  Model.on('empty', function (result) {
+    t.ok(result.isValid)
+    t.equal(result.extract(), null)
+  })
+
+  Model.on('fail', function (result) {
+    t.ok(result.isError)
+    t.ok(result.extract() instanceof Error)
+    t.throws(() => result.value(), /failure/)
+  })
+
+  obj.empty()
+  obj.fail()
   t.end()
 })
