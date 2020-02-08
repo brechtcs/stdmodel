@@ -19,6 +19,14 @@ Model.prototype.fail = function () {
   throw new Error('failure')
 }
 
+test('basic', function (t) {
+  var obj = new Model('basic')
+  var res = obj.input('yep')
+  t.equal(res, 'basic: yep')
+  t.throws(() => obj.fail(), /failure/)
+  t.end()
+})
+
 test('static', function (t) {
   var pending = true
 
@@ -79,7 +87,10 @@ test('result', function (t) {
     t.throws(() => result.value(), /failure/)
   })
 
-  obj.empty()
-  obj.fail()
-  t.end()
+  try {
+    obj.empty()
+    obj.fail()
+  } catch (e) {} finally {
+    t.end()
+  }
 })

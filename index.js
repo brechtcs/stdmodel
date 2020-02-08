@@ -23,9 +23,14 @@ module.exports = function (Model) {
     }
     return new Proxy(target[prop], {
       apply (fn, self, args) {
-        var res = Result.of(fn, self, args)
-        bus.emit(prop, res, target, args)
-        return res.value()
+        try {
+          var res = fn.apply(self, args)
+          bus.emit(prop, new Result(res), target, args)
+          return res
+        } catch (err) {
+          bus.emit(prop, new Result(err), target, args)
+          throw err
+        }
       }
     })
   }
@@ -38,15 +43,6 @@ module.exports = function (Model) {
  */
 function Result (res) {
   Base.call(this, res)
-}
-
-Result.of = function (fn, self, args) {
-  try {
-    var res = fn.apply(self, args)
-    return new Result(res)
-  } catch (err) {
-    return new Result(err)
-  }
 }
 
 Result.parse = function (res) {
