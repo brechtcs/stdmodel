@@ -25,7 +25,7 @@ module.exports = function (Model) {
       apply (fn, self, args) {
         var res = Result.of(fn, self, args)
         bus.emit(prop, res, target, args)
-        return res
+        return res.value()
       }
     })
   }
