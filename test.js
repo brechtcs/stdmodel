@@ -1,6 +1,10 @@
+var Base = require('stdopt/base')
 var model = require('./')
 var test = require('tape')
 
+/**
+ * Fixtures
+ */
 var Model = model(function Model (prefix) {
   this.prefix = prefix
 })
@@ -19,6 +23,25 @@ Model.prototype.fail = function () {
   throw new Error('failure')
 }
 
+Model.prototype.message = function (msg) {
+  return new Message(msg)
+}
+
+function Message (msg) {
+  Base.call(this, msg)
+}
+
+Message.parse = function (msg) {
+  return String(msg)
+}
+
+Message.prototype.shout = function () {
+  return this.value().toUpperCase() + '!'
+}
+
+/**
+ * Tests
+ */
 test('basic', function (t) {
   var obj = new Model('basic')
   var res = obj.input('yep')
@@ -68,8 +91,13 @@ test('instances', function (t) {
     }
   })
 
+  Model.on('message', function (result) {
+    t.equal(result.shout(), 'HELLO!')
+  })
+
   first.input('dit', 'nope')
   second.input('dat')
+  second.message('hello')
   t.end()
 })
 

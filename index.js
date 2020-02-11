@@ -25,7 +25,8 @@ module.exports = function (Model) {
       apply (fn, self, args) {
         try {
           var res = fn.apply(self, args)
-          bus.emit(prop, new Result(res), target, args)
+          var opt = res instanceof Base ? res : new Result(res)
+          bus.emit(prop, opt, target, args)
           return res
         } catch (err) {
           bus.emit(prop, new Result(err), target, args)
