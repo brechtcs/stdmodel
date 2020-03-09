@@ -1,13 +1,13 @@
 {
   "name": "stdmodel",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Turn model classes into emitters",
   "main": "index.js",
   "scripts": {
     "test": "tape test.js && standard"
   },
   "dependencies": {
-    "stdopt": "^9.0.0"
+    "stdopt": "^10.1.0"
   },
   "devDependencies": {
     "standard": "^14.3.1",
